@@ -28,9 +28,9 @@ import com.navercorp.pinpoint.bootstrap.logging.PLoggerFactory;
 import com.navercorp.pinpoint.bootstrap.plugin.ProfilerPlugin;
 import com.navercorp.pinpoint.bootstrap.plugin.ProfilerPluginSetupContext;
 import com.navercorp.pinpoint.common.trace.ServiceType;
-import com.navercorp.pinpoint.plugin.jboss.JbossConfig;
-import com.navercorp.pinpoint.plugin.jboss.JbossConstants;
-import com.navercorp.pinpoint.plugin.jboss.JbossDetector;
+//import com.navercorp.pinpoint.plugin.jboss.JbossConfig;
+//import com.navercorp.pinpoint.plugin.jboss.JbossConstants;
+//import com.navercorp.pinpoint.plugin.jboss.JbossDetector;
 import com.navercorp.pinpoint.plugin.tomcat.interceptor.ConnectorInitializeInterceptor;
 import com.navercorp.pinpoint.plugin.tomcat.interceptor.RequestStartAsyncInterceptor;
 import com.navercorp.pinpoint.plugin.tomcat.interceptor.StandardHostValveInvokeInterceptor;
@@ -79,12 +79,12 @@ public class TomcatPlugin implements ProfilerPlugin, TransformTemplateAware {
         if (TomcatConstants.TOMCAT.equals(configuredApplicationType)) {
             return true;
         }
-        final JbossConfig jbossConfig = new JbossConfig(context.getConfig());
-        final JbossDetector jbossDetector = new JbossDetector(jbossConfig.getBootstrapMains());
-        if (jbossDetector.detect()) {
-            logger.info("Detected application type : {}", JbossConstants.JBOSS);
-            return false;
-        }
+//        final JbossConfig jbossConfig = new JbossConfig(context.getConfig());
+//        final JbossDetector jbossDetector = new JbossDetector(jbossConfig.getBootstrapMains());
+//        if (jbossDetector.detect()) {
+//            logger.info("Detected application type : {}", JbossConstants.JBOSS);
+//            return false;
+//        }
         return true;
     }
 

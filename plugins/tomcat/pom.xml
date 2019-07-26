@@ -65,12 +65,12 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>com.navercorp.pinpoint</groupId>
-            <artifactId>pinpoint-jboss-plugin</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.navercorp.pinpoint</groupId>-->
+<!--            <artifactId>pinpoint-jboss-plugin</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--            <scope>compile</scope>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>javax.servlet</groupId>

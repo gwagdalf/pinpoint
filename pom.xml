@@ -876,7 +876,7 @@
                                     <version>3.5</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>1.8</version>
+                                    <version>1.11</version>
                                 </requireJavaVersion>
                                 <requireEnvironmentVariable>
                                     <variableName>JAVA_HOME</variableName>
@@ -892,6 +892,9 @@
                                 </requireEnvironmentVariable>
                                 <requireEnvironmentVariable>
                                     <variableName>JAVA_9_HOME</variableName>
+                                </requireEnvironmentVariable>
+                                <requireEnvironmentVariable>
+                                    <variableName>JAVA_11_HOME</variableName>
                                 </requireEnvironmentVariable>
                             </rules>
                             <fail>true</fail>
