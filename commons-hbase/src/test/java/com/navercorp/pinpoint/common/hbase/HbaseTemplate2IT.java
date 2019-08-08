@@ -17,15 +17,29 @@
 package com.navercorp.pinpoint.common.hbase;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.TableNotFoundException;
+import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.RetriesExhaustedWithDetailsException;
+import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.filter.BinaryComparator;
+import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
+import org.apache.hadoop.hbase.filter.Filter;
+import org.apache.hadoop.hbase.filter.FilterList;
+import org.apache.hadoop.hbase.filter.FilterList.Operator;
+import org.apache.hadoop.hbase.filter.PrefixFilter;
+import org.apache.hadoop.hbase.filter.QualifierFilter;
+import org.apache.hadoop.hbase.shaded.com.google.protobuf.ServiceException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -50,12 +64,30 @@ public class HbaseTemplate2IT {
         Configuration cfg = HBaseConfiguration.create();
         cfg.set("hbase.zookeeper.quorum", properties.getProperty("hbase.client.host"));
         cfg.set("hbase.zookeeper.property.clientPort", properties.getProperty("hbase.client.port"));
+        cfg.set("zookeeper.znode.parent", properties.getProperty("hbase.zookeeper.znode.parent"));
+
+
+        cfg.set("hbase.rpc.timeout",properties.getProperty("hbase.rpc.timeout"));
+        cfg.set("hbase.client.operation.timeout",properties.getProperty("hbase.client.operation.timeout"));
+        cfg.set("hbase.ipc.client.socket.timeout.read",properties.getProperty("hbase.ipc.client.socket.timeout.read"));
+        cfg.set("hbase.ipc.client.socket.timeout.write",properties.getProperty("hbase.ipc.client.socket.timeout.write"));
+        cfg.set("zookeeper.session.timeout","3000");
+
+
 
         connection = ConnectionFactory.createConnection(cfg);
+        Admin admin = connection.getAdmin();
         hbaseTemplate2 = new HbaseTemplate2();
         hbaseTemplate2.setConfiguration(cfg);
         hbaseTemplate2.setTableFactory(new HbaseTableFactory(connection));
         hbaseTemplate2.afterPropertiesSet();
+
+//        try {
+//            HBaseAdmin.checkHBaseAvailable(cfg);
+//        } catch (ServiceException e) {
+//            Assert.fail("unexpected exception :" + e.getCause());
+//        }
+
     }
 
     @AfterClass

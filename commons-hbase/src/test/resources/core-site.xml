@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+	<property>
+	  <name>hadoop.security.group.mapping</name>
+	  <value>org.apache.hadoop.security.LdapGroupsMapping</value>
+	</property>
+
+	<property>
+	  <name>hadoop.security.group.mapping.ldap.url</name>
+	  <value>ldap://192.168.71.51:389</value>
+	</property>
+
+	<property>
+	  <name>hadoop.security.group.mapping.ldap.bind.user</name>
+	  <value>slick2@ebaykorea.corp</value>
+	</property>
+
+	<property>
+	  <name>hadoop.security.group.mapping.ldap.bind.password</name>
+	  <value>R$4summersmilecart</value>
+	</property>
+
+	<property>
+	  <name>hadoop.security.group.mapping.ldap.base</name>
+	  <value>dc=example-ad,dc=local</value>
+	</property>
+
+	<property>
+	  <name>hadoop.security.group.mapping.ldap.search.filter.user</name>
+	  <value>(&amp;(objectClass=user)(sAMAccountName={0}))</value>
+	</property>
+
+	<property>
+	  <name>hadoop.security.group.mapping.ldap.search.filter.group</name>
+	  <value>(objectClass=group)</value>
+	</property>
+
+	<property>
+	  <name>hadoop.security.group.mapping.ldap.search.attr.member</name>
+	  <value>member</value>
+	</property>
+
+	<property>
+	  <name>hadoop.security.group.mapping.ldap.search.attr.group.name</name>
+	  <value>cn</value>
+	</property>
+
+</configuration>

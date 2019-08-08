@@ -54,6 +54,12 @@ public class WebConfig {
     @Value("#{pinpointWebProps['cluster.connect.address'] ?: ''}")
     private String clusterConnectAddress;
 
+    @Value("#{pinpointWebProps['hbase.client.id='] ?: ''}")
+    private String hbaseClientId;
+
+    @Value("#{pinpointWebProps['hbase.client.password'] ?: ''}")
+    private String hbaseClientPassword;
+
     @PostConstruct
     public void validation() {
         if (isClusterEnable()) {
@@ -118,6 +124,14 @@ public class WebConfig {
 
     public String getClusterConnectAddress() {
         return clusterConnectAddress;
+    }
+
+    public String getHbaseClientId() {
+        return hbaseClientId;
+    }
+
+    public String getHbaseClientPassword() {
+        return hbaseClientPassword;
     }
 
     @Override

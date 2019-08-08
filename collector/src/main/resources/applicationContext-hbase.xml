@@ -7,6 +7,7 @@
     <bean id="hbaseConfiguration" class="com.navercorp.pinpoint.common.hbase.HbaseConfigurationFactoryBean">
         <property name="properties">
             <props>
+
                 <prop key="hbase.zookeeper.quorum">${hbase.client.host}</prop>
                 <prop key="hbase.zookeeper.property.clientPort">${hbase.client.port}</prop>
 
@@ -32,8 +33,13 @@
                 <prop key="hbase.client.async.in.queuesize">${hbase.client.async.in.queuesize:10000}</prop>
                 <prop key="hbase.tablemultiplexer.flush.period.ms">${hbase.client.async.flush.period.ms:100}</prop>
                 <prop key="hbase.client.max.retries.in.queue">${hbase.client.async.max.retries.in.queue:10000}</prop>
+
+                <!-- ldap -->
+                <prop key="hbase.client.async.enable">${hbase.client.async.enable:false}</prop>
+
             </props>
         </property>
+
     </bean>
 
     <bean id="hbaseThreadPool" class="com.navercorp.pinpoint.common.server.util.ThreadPoolExecutorFactoryBean">

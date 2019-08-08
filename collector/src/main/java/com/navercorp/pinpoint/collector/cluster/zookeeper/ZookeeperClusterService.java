@@ -100,7 +100,7 @@ public class ZookeeperClusterService extends AbstractClusterService {
                     logger.info("{} initialization started.", this.getClass().getSimpleName());
 
                     ClusterManagerWatcher watcher = new ClusterManagerWatcher();
-                    this.client = new CuratorZookeeperClient(config.getClusterAddress(), config.getClusterSessionTimeout(), watcher);
+                    this.client = new CuratorZookeeperClient(config.getClusterAddress(), config.getHbaseClientId(), config.getHbaseClientPassword(),  config.getClusterSessionTimeout(), watcher);
                     this.client.connect();
 
                     this.profilerClusterManager = new ZookeeperProfilerClusterManager(client, serverIdentifier, clusterPointRouter.getTargetClusterPointRepository());

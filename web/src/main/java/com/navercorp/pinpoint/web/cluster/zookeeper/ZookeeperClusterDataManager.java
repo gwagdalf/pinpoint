@@ -58,6 +58,8 @@ public class ZookeeperClusterDataManager implements ClusterDataManager, Zookeepe
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final String connectAddress;
+    private final String hbaseClientId;
+    private final String hbaseCliendPassword;
     private final int sessionTimeout;
     private final int retryInterval;
 
@@ -75,6 +77,8 @@ public class ZookeeperClusterDataManager implements ClusterDataManager, Zookeepe
 
     public ZookeeperClusterDataManager(WebConfig config) {
         this.connectAddress = config.getClusterZookeeperAddress();
+        this.hbaseClientId = config.getHbaseClientId();
+        this.hbaseCliendPassword = config.getHbaseClientPassword();
         this.sessionTimeout = config.getClusterZookeeperSessionTimeout();
         this.retryInterval = config.getClusterZookeeperRetryInterval();
 
@@ -88,7 +92,7 @@ public class ZookeeperClusterDataManager implements ClusterDataManager, Zookeepe
     @Override
     public void start() throws Exception {
         this.timer = createTimer();
-        this.client = new CuratorZookeeperClient(connectAddress, sessionTimeout, this);
+        this.client = new CuratorZookeeperClient(connectAddress, hbaseClientId, hbaseCliendPassword,sessionTimeout, this);
         this.client.connect();
         if (periodicSyncTask != null) {
             this.timer.newTimeout(periodicSyncTask, periodicSyncTask.getIntervalMillis(), TimeUnit.MILLISECONDS);

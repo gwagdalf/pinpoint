@@ -156,6 +156,13 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
+            <version>1.6</version>
+            <scope>system</scope>
+            <systemPath>C:\Program Files\Zulu\zulu-11\lib\tools-1.6.0.16.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -876,7 +883,7 @@
                                     <version>3.5</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>1.8</version>
+                                    <version>1.11</version>
                                 </requireJavaVersion>
                                 <requireEnvironmentVariable>
                                     <variableName>JAVA_HOME</variableName>

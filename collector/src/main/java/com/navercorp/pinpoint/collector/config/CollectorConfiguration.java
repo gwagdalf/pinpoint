@@ -37,6 +37,18 @@ import java.util.Properties;
  */
 public class CollectorConfiguration implements InitializingBean {
 
+    public static Logger getLOGGER() {
+        return LOGGER;
+    }
+
+    public String getHbaseClientId() {
+        return hbaseClientId;
+    }
+
+    public String getHbaseClientPassword() {
+        return hbaseClientPassword;
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CollectorConfiguration.class);
 
     private static final String CONFIG_FILE_NAME = "pinpoint-collector.properties";
@@ -57,6 +69,8 @@ public class CollectorConfiguration implements InitializingBean {
 
     private boolean clusterEnable;
     private String clusterAddress;
+    private String hbaseClientId;
+    private String hbaseClientPassword;
     private int clusterSessionTimeout;
 
     private String clusterListenIp;
@@ -172,6 +186,8 @@ public class CollectorConfiguration implements InitializingBean {
         
         this.clusterEnable = readBoolean(properties, "cluster.enable");
         this.clusterAddress = readString(properties, "cluster.zookeeper.address", "");
+        this.hbaseClientId = readString(properties, "hbase.client.id", "");
+        this.hbaseClientPassword = readString(properties, "hbase.client.password", "");
         this.clusterSessionTimeout = readInt(properties, "cluster.zookeeper.sessiontimeout", -1);
 
         this.clusterListenIp = readString(properties, "cluster.listen.ip", "");

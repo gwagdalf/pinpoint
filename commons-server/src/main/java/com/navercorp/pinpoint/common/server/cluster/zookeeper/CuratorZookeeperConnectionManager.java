@@ -18,8 +18,14 @@ package com.navercorp.pinpoint.common.server.cluster.zookeeper;
 
 import com.navercorp.pinpoint.common.server.cluster.zookeeper.exception.PinpointZookeeperException;
 import com.navercorp.pinpoint.common.util.Assert;
+import com.navercorp.pinpoint.common.util.StringUtils;
+import io.opencensus.internal.StringUtil;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.RetrySleeper;
+import org.apache.curator.framework.AuthInfo;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.slf4j.Logger;
@@ -37,17 +43,30 @@ class CuratorZookeeperConnectionManager {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final CuratorFramework curatorFramework;
-    private final PinpointZookeeperConnectionStateListener connectionStateListener;
+    private CuratorFramework curatorFramework;
+    private PinpointZookeeperConnectionStateListener connectionStateListener;
 
 
     public CuratorZookeeperConnectionManager(String hostPort, int sessionTimeout, ZookeeperEventWatcher zookeeperEventWatcher) {
+        initialize(hostPort, "", "", sessionTimeout, zookeeperEventWatcher);
+    }
+
+    public CuratorZookeeperConnectionManager(String hostPort, String hbaseClientId, String hbaseClientPassword, int sessionTimeout, ZookeeperEventWatcher zookeeperEventWatcher) {
+        initialize(hostPort, hbaseClientId, hbaseClientPassword, sessionTimeout, zookeeperEventWatcher);
+    }
+
+    private void initialize(String hostPort, String hbaseClientId, String hbaseClientPassword, int sessionTimeout, ZookeeperEventWatcher zookeeperEventWatcher) {
         Assert.requireNonNull(hostPort, "hostPort must not be null");
         Assert.isTrue(sessionTimeout > 0, "sessionTimeout must be greater than 0");
         Assert.requireNonNull(zookeeperEventWatcher, "zookeeperEventWatcher must not be null");
 
         CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder();
         builder.connectString(hostPort);
+
+        if(!StringUtils.isEmpty(hbaseClientId)){
+            builder.authorization(Arrays.asList(new AuthInfo("digest", String.format("%s:%s",hbaseClientId, hbaseClientPassword).getBytes())));
+        }
+
         builder.retryPolicy(new RetryPolicy() {
             @Override
             public boolean allowRetry(int retryCount, long elapsedTimeMs, RetrySleeper sleeper) {

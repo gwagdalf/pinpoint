@@ -54,6 +54,12 @@ public class CuratorZookeeperClient implements ZookeeperClient {
         this.connectionManager = new CuratorZookeeperConnectionManager(hostPort, sessionTimeout, zookeeperEventWatcher);
     }
 
+    public CuratorZookeeperClient(String hostPort, String hbaseClientId, String hbaseClientPassword, int sessionTimeout, ZookeeperEventWatcher zookeeperEventWatcher) {
+        this.zookeeperEventWatcher = Assert.requireNonNull(zookeeperEventWatcher, "zookeeperEventWatcher must not be null");
+
+        this.connectionManager = new CuratorZookeeperConnectionManager(hostPort, hbaseClientId, hbaseClientPassword, sessionTimeout, zookeeperEventWatcher);
+    }
+
     @Override
     public void connect() throws IOException {
         logger.debug("connect() started");
