@@ -97,6 +97,7 @@
         <module>elasticsearch</module>
         <module>reactor</module>
         <module>reactor-netty</module>
+      <module>mssql-jdbc</module>
     </modules>
 
     <dependencyManagement>
