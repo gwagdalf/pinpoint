@@ -20,7 +20,6 @@ import com.navercorp.pinpoint.bootstrap.instrument.InstrumentClass;
 import com.navercorp.pinpoint.bootstrap.instrument.InstrumentException;
 import com.navercorp.pinpoint.bootstrap.instrument.InstrumentMethod;
 import com.navercorp.pinpoint.bootstrap.instrument.Instrumentor;
-import com.navercorp.pinpoint.bootstrap.instrument.MethodFilter;
 import com.navercorp.pinpoint.bootstrap.instrument.transformer.TransformCallback;
 import com.navercorp.pinpoint.bootstrap.instrument.transformer.TransformTemplate;
 import com.navercorp.pinpoint.bootstrap.instrument.transformer.TransformTemplateAware;
@@ -35,9 +34,6 @@ import com.navercorp.pinpoint.bootstrap.plugin.jdbc.DatabaseInfoAccessor;
 import com.navercorp.pinpoint.bootstrap.plugin.jdbc.JdbcUrlParserV2;
 import com.navercorp.pinpoint.bootstrap.plugin.jdbc.ParsingResultAccessor;
 import com.navercorp.pinpoint.bootstrap.plugin.jdbc.PreparedStatementBindingMethodFilter;
-import com.navercorp.pinpoint.bootstrap.plugin.jdbc.interceptor.CallableStatementBindVariableInterceptor;
-import com.navercorp.pinpoint.bootstrap.plugin.jdbc.interceptor.CallableStatementExecuteQueryInterceptor;
-import com.navercorp.pinpoint.bootstrap.plugin.jdbc.interceptor.CallableStatementRegisterOutParameterInterceptor;
 import com.navercorp.pinpoint.bootstrap.plugin.jdbc.interceptor.ConnectionCloseInterceptor;
 import com.navercorp.pinpoint.bootstrap.plugin.jdbc.interceptor.DriverConnectInterceptorV2;
 import com.navercorp.pinpoint.bootstrap.plugin.jdbc.interceptor.PreparedStatementBindVariableInterceptor;
@@ -80,13 +76,9 @@ public class MssqlPlugin implements ProfilerPlugin, TransformTemplateAware {
         addConnectionTransformer();
         addDriverTransformer();
         addPreparedStatementTransformer();
-//        addPreparedStatementBindVariableTransformer();
-//        addCallableStatementTransformer();
+        addCallableStatementTransformer();
         addStatementTransformer();
 
-        // MariaDb 1.3.x's CallableStatements are completely separated from PreparedStatements (similar to MySQL)
-        // Separate interceptors must be injected.
-//        add_1_3_x_CallableStatementTransformer();
     }
 
     private void addConnectionTransformer() {
@@ -183,7 +175,7 @@ public class MssqlPlugin implements ProfilerPlugin, TransformTemplateAware {
             InstrumentUtils
                 .findMethod(target, "connect",  "java.lang.String", "java.util.Properties")
                     .addScopedInterceptor(DriverConnectInterceptorV2.class,
-                            va(MssqlConstants.MSSQL, true), MSSQL_SCOPE, ExecutionPolicy.ALWAYS);
+                            va(MssqlConstants.MSSQL_JDBC, true), MSSQL_SCOPE, ExecutionPolicy.ALWAYS);
 
             return target.toBytecode();
         }
@@ -191,14 +183,6 @@ public class MssqlPlugin implements ProfilerPlugin, TransformTemplateAware {
 
     private void addPreparedStatementTransformer() {
         transformTemplate.transform("com.microsoft.sqlserver.jdbc.SQLServerPreparedStatement", PreparedStatementTransform.class);
-//        transformTemplate.transform("org.mariadb.jdbc.MariaDbClientPreparedStatement", PreparedStatementTransform.class);
-        // [1.6.0,1.8.0), [2.0.0,2.4.0)
-//        transformTemplate.transform("org.mariadb.jdbc.MariaDbPreparedStatementServer", PreparedStatementTransform.class);
-//        transformTemplate.transform("org.mariadb.jdbc.MariaDbPreparedStatementClient", PreparedStatementTransform.class);
-        // [1.8.0,2.0.0), [2.4.0,)
-//        transformTemplate.transform("org.mariadb.jdbc.ServerSidePreparedStatement", PreparedStatementTransform.class);
-//        transformTemplate.transform("org.mariadb.jdbc.ClientSidePreparedStatement", PreparedStatementTransform.class);
-
     }
 
     public static class PreparedStatementTransform implements TransformCallback {
@@ -238,45 +222,13 @@ public class MssqlPlugin implements ProfilerPlugin, TransformTemplateAware {
             return target.toBytecode();
         }
     };
-//
-//    private void addPreparedStatementBindVariableTransformer() {
-//        transformTemplate.transform("org.mariadb.jdbc.AbstractMariaDbPrepareStatement", PreparedStatementBindVariableTransformer.class);
-//        // Class renamed in 1.5.6 - https://github.com/MariaDB/mariadb-connector-j/commit/16c8313960cf4fbc6b2b83136504d1ba9e662919
-//        transformTemplate.transform("org.mariadb.jdbc.AbstractPrepareStatement", PreparedStatementBindVariableTransformer.class);
-//        // 1.6.x
-//        transformTemplate.transform("org.mariadb.jdbc.BasePrepareStatement", PreparedStatementBindVariableTransformer.class);
-//    }
-//
-//
-//    public static class PreparedStatementBindVariableTransformer implements TransformCallback {
-//
-//        @Override
-//        public byte[] doInTransform(Instrumentor instrumentor, ClassLoader loader, String className,
-//                                    Class<?> classBeingRedefined, ProtectionDomain protectionDomain, byte[] classfileBuffer)
-//                throws InstrumentException {
-//            MssqlConfig config = new MssqlConfig(instrumentor.getProfilerConfig());
-//            InstrumentClass target = instrumentor.getInstrumentClass(loader, className, classfileBuffer);
-//
-//            target.addField(DatabaseInfoAccessor.class);
-//            target.addField(ParsingResultAccessor.class);
-//            target.addField(BindValueAccessor.class);
-//
-//            if (config.isTraceSqlBindValue()) {
-//                final PreparedStatementBindingMethodFilter excludes = PreparedStatementBindingMethodFilter
-//                        .excludes("setRowId", "setNClob", "setSQLXML");
-//
-//                final List<InstrumentMethod> declaredMethods = target.getDeclaredMethods(excludes);
-//                for (InstrumentMethod method : declaredMethods) {
-//                    method.addScopedInterceptor(PreparedStatementBindVariableInterceptor.class, MSSQL_SCOPE, ExecutionPolicy.BOUNDARY);
-//                }
-//            }
-//
-//            return target.toBytecode();
-//        }
-//    };
 
     private void addStatementTransformer() {
         transformTemplate.transform("com.microsoft.sqlserver.jdbc.SQLServerStatement", MssqlStatementTransform.class);
+    }
+
+    private void addCallableStatementTransformer() {
+      transformTemplate.transform("com.microsoft.sqlserver.jdbc.SQLServerCallableStatement", MssqlStatementTransform.class);
     }
 
     public static class MssqlStatementTransform implements TransformCallback {
@@ -310,87 +262,6 @@ public class MssqlPlugin implements ProfilerPlugin, TransformTemplateAware {
             return target.toBytecode();
         }
     };
-
-//    private void addCallableStatementTransformer() {
-//        transformTemplate.transform("org.mariadb.jdbc.AbstractCallableProcedureStatement", CallableStatementTransformer.class);
-//        transformTemplate.transform("org.mariadb.jdbc.AbstractCallableFunctionStatement", CallableStatementTransformer.class);
-//        // 1.6.x
-//        transformTemplate.transform("org.mariadb.jdbc.CallableProcedureStatement", CallableStatementTransformer.class);
-//        transformTemplate.transform("org.mariadb.jdbc.CallableFunctionStatement", CallableStatementTransformer.class);
-//    }
-//
-//    public static class CallableStatementTransformer implements TransformCallback {
-//        @Override
-//        public byte[] doInTransform(Instrumentor instrumentor, ClassLoader loader, String className,
-//                                    Class<?> classBeingRedefined, ProtectionDomain protectionDomain,
-//                                    byte[] classfileBuffer) throws InstrumentException {
-//            InstrumentClass target = instrumentor.getInstrumentClass(loader, className, classfileBuffer);
-//
-//            target.addField(DatabaseInfoAccessor.class);
-//            target.addField(ParsingResultAccessor.class);
-//            target.addField(BindValueAccessor.class);
-//
-//            final Class<? extends Interceptor> registerOutParameterInterceptor = CallableStatementRegisterOutParameterInterceptor.class;
-//            InstrumentUtils.findMethod(target, "registerOutParameter", "int", "int")
-//                    .addScopedInterceptor(registerOutParameterInterceptor, MSSQL_SCOPE);
-//            InstrumentUtils.findMethod(target, "registerOutParameter", "int", "int", "int")
-//                    .addScopedInterceptor(registerOutParameterInterceptor, MSSQL_SCOPE);
-//            InstrumentUtils
-//                .findMethod(target, "registerOutParameter", "int", "int", "java.lang.String")
-//                    .addScopedInterceptor(registerOutParameterInterceptor, MSSQL_SCOPE);
-//
-//            return target.toBytecode();
-//        }
-//    };
-
-//    private void add_1_3_x_CallableStatementTransformer() {
-//        transformTemplate.transform("org.mariadb.jdbc.MariaDbCallableStatement", CallableStatement1_3_x_Transform.class);
-//    }
-//
-//    public static class CallableStatement1_3_x_Transform implements TransformCallback {
-//        @Override
-//        public byte[] doInTransform(Instrumentor instrumentor, ClassLoader loader, String className,
-//                Class<?> classBeingRedefined, ProtectionDomain protectionDomain,
-//        byte[] classfileBuffer) throws InstrumentException {
-//            MssqlConfig config = new MssqlConfig(instrumentor.getProfilerConfig());
-//
-//            InstrumentClass target = instrumentor.getInstrumentClass(loader, className, classfileBuffer);
-//
-//            target.addField(DatabaseInfoAccessor.class);
-//            target.addField(ParsingResultAccessor.class);
-//            target.addField(BindValueAccessor.class);
-//
-//            int maxBindValueSize = config.getMaxSqlBindValueSize();
-//
-//            final Class<? extends Interceptor> callableStatementExecuteQuery = CallableStatementExecuteQueryInterceptor.class;
-//            InstrumentUtils.findMethod(target,"execute")
-//                    .addScopedInterceptor(callableStatementExecuteQuery, va(maxBindValueSize), MSSQL_SCOPE);
-//            InstrumentUtils.findMethod(target, "executeQuery")
-//                    .addScopedInterceptor(callableStatementExecuteQuery, va(maxBindValueSize), MSSQL_SCOPE);
-//            InstrumentUtils.findMethod(target, "executeUpdate")
-//                    .addScopedInterceptor(callableStatementExecuteQuery, va(maxBindValueSize), MSSQL_SCOPE);
-//
-//            final Class<? extends Interceptor> registerOutParameterInterceptor = CallableStatementRegisterOutParameterInterceptor.class;
-//            InstrumentUtils.findMethod(target, "registerOutParameter", "int", "int")
-//                    .addScopedInterceptor(registerOutParameterInterceptor, MSSQL_SCOPE);
-//            InstrumentUtils.findMethod(target, "registerOutParameter", "int", "int", "int")
-//                    .addScopedInterceptor(registerOutParameterInterceptor, MSSQL_SCOPE);
-//            InstrumentUtils
-//                .findMethod(target, "registerOutParameter", "int", "int", "java.lang.String")
-//                    .addScopedInterceptor(registerOutParameterInterceptor, MSSQL_SCOPE);
-//
-//
-//            if (config.isTraceSqlBindValue()) {
-//                final MethodFilter filter = new PreparedStatementBindingMethodFilter();
-//                final List<InstrumentMethod> declaredMethods = target.getDeclaredMethods(filter);
-//                for (InstrumentMethod method : declaredMethods) {
-//                    method.addScopedInterceptor(CallableStatementBindVariableInterceptor.class, MSSQL_SCOPE);
-//                }
-//            }
-//
-//            return target.toBytecode();
-//        }
-//    }
 
     @Override
     public void setTransformTemplate(TransformTemplate transformTemplate) {

@@ -26,12 +26,12 @@ public class MssqlConfig extends JdbcConfig {
     private final boolean profileRollback;
 
     public MssqlConfig(ProfilerConfig config) {
-        super(config.readBoolean("profiler.jdbc.mssql", true),
+        super(config.readBoolean("profiler.jdbc.mssql", false),
                 config.readBoolean("profiler.jdbc.mssql.tracesqlbindvalue", config.isTraceSqlBindValue()),
                 config.getMaxSqlBindValueSize());
-        this.profileSetAutoCommit = config.readBoolean("profiler.jdbc.mssql.setautocommit", true);
-        this.profileCommit = config.readBoolean("profiler.jdbc.mssql.commit", true);
-        this.profileRollback = config.readBoolean("profiler.jdbc.mssql.rollback", true);
+        this.profileSetAutoCommit = config.readBoolean("profiler.jdbc.mssql.setautocommit", false);
+        this.profileCommit = config.readBoolean("profiler.jdbc.mssql.commit", false);
+        this.profileRollback = config.readBoolean("profiler.jdbc.mssql.rollback", false);
     }
 
     public boolean isProfileSetAutoCommit() {

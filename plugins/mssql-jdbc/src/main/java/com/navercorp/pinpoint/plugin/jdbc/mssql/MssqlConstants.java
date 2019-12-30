@@ -31,9 +31,9 @@ public final class MssqlConstants {
 
     public static final String MSSQL_SCOPE = "MSSQL_JDBC";
 
-    public static final ServiceType MSSQL = ServiceTypeFactory
-        .of(92150, "MSSQL", TERMINAL, INCLUDE_DESTINATION_ID);
-    public static final ServiceType MSSQL_EXECUTE_QUERY = ServiceTypeFactory
-        .of(92151, "MSSQL_EXECUTE_QUERY",
-            "MSSQL", TERMINAL, RECORD_STATISTICS, INCLUDE_DESTINATION_ID);
+    public static final ServiceType MSSQL_JDBC = ServiceTypeFactory
+        .of(2250, "MSSQL_JDBC", TERMINAL, INCLUDE_DESTINATION_ID);
+    public static final ServiceType MSSQL_JDBC_QUERY = ServiceTypeFactory
+        .of(2251, "MSSQL_JDBC_QUERY",
+            "MSSQL_JDBC", TERMINAL, RECORD_STATISTICS, INCLUDE_DESTINATION_ID);
 }

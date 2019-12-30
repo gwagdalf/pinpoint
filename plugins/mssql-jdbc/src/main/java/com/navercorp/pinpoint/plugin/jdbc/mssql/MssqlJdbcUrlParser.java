@@ -36,7 +36,6 @@ import java.util.Set;
 public class MssqlJdbcUrlParser implements JdbcUrlParserV2 {
 
 //    jdbc:sqlserver://[serverName[\instanceName][:portNumber]][;property=value[;property=value]]
-//    jdbc:sqlserver://서버IP주소:1433;DatabaseName=데이터베이스명
     private static final String MSSQL_URL_PREFIX = "jdbc:sqlserver:";
     private static final String MARIA_URL_PREFIX = "jdbc:mariadb:";
     private static final String MYSQL_URL_PREFIX = "jdbc:mysql:";
@@ -54,7 +53,7 @@ public class MssqlJdbcUrlParser implements JdbcUrlParserV2 {
 
         Type type = getType(jdbcUrl);
         if (type == null) {
-            logger.info("jdbcUrl has invalid prefix.(url:{}, valid prefixes:{}, {})", jdbcUrl, MSSQL_URL_PREFIX, MYSQL_URL_PREFIX);
+            logger.info("jdbcUrl has invalid prefix.(url:{}, valid prefixes:{})", jdbcUrl, MSSQL_URL_PREFIX);
             return UnKnownDatabaseInfo.INSTANCE;
         }
 
@@ -63,7 +62,7 @@ public class MssqlJdbcUrlParser implements JdbcUrlParserV2 {
         } catch (Exception e) {
             logger.info("MssqlJdbcUrl parse error. url: {}, Caused: {}", jdbcUrl, e.getMessage(), e);
             return UnKnownDatabaseInfo
-                .createUnknownDataBase(MssqlConstants.MSSQL, MssqlConstants.MSSQL_EXECUTE_QUERY, jdbcUrl);
+                .createUnknownDataBase(MssqlConstants.MSSQL_JDBC, MssqlConstants.MSSQL_JDBC_QUERY, jdbcUrl);
         }
     }
 
@@ -85,17 +84,18 @@ public class MssqlJdbcUrlParser implements JdbcUrlParserV2 {
         maker.after(type.getUrlPrefix());
         // 1.2.3.4:5678 In case of replication driver could have multiple values
         // We have to consider mm db too.
-        String host = maker.after("//").before('/').value();
+        String host = maker.after("//").before(';').value();
 
         // Decided not to cache regex. This is not invoked often so don't waste
         // memory.
         String[] parsedHost = host.split(",");
         List<String> hostList = Arrays.asList(parsedHost);
 
-        String databaseId = maker.next().afterLast('/').before('?').value();
-        String normalizedUrl = maker.clear().before('?').value();
+        String databaseId = maker.next().after("databaseName=").before(';').value();
+        String normalizedUrl = maker.clear().before("databaseName=").value();
+            //.before('?').value();
 
-        return new DefaultDatabaseInfo(MssqlConstants.MSSQL, MssqlConstants.MSSQL_EXECUTE_QUERY, url,
+        return new DefaultDatabaseInfo(MssqlConstants.MSSQL_JDBC, MssqlConstants.MSSQL_JDBC_QUERY, url,
                 normalizedUrl, hostList, databaseId);
     }
 
@@ -105,20 +105,20 @@ public class MssqlJdbcUrlParser implements JdbcUrlParserV2 {
         maker.after(type.getUrlPrefix());
         // 1.2.3.4:5678 In case of replication driver could have multiple values
         // We have to consider mm db too.
-        String host = maker.after("//").before('/').value();
+        String host = maker.after("//").before(';').value();
         List<String> hostList = new ArrayList<String>(1);
         hostList.add(host);
-        // String port = maker.next().after(':').before('/').value();
+        // String port = maker.next().after(':').before(';').value();
 
-        String databaseId = maker.next().afterLast('/').before('?').value();
-        String normalizedUrl = maker.clear().before('?').value();
-        return new DefaultDatabaseInfo(MssqlConstants.MSSQL, MssqlConstants.MSSQL_EXECUTE_QUERY, url,
+        String databaseId = maker.next().after("databaseName=").before(';').value();
+        String normalizedUrl = maker.clear().before("databaseName=").value() + "databaseName=" + databaseId;
+        return new DefaultDatabaseInfo(MssqlConstants.MSSQL_JDBC, MssqlConstants.MSSQL_JDBC_QUERY, url,
                 normalizedUrl, hostList, databaseId);
     }
 
     @Override
     public ServiceType getServiceType() {
-        return MssqlConstants.MSSQL;
+        return MssqlConstants.MSSQL_JDBC;
     }
 
     private static Type getType(String jdbcUrl) {

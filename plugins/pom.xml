@@ -43,6 +43,7 @@
         <module>cubrid-jdbc</module>
         <module>mysql-jdbc</module>
         <module>mariadb-jdbc</module>
+        <module>mssql-jdbc</module>
         <module>postgresql-jdbc</module>
         <module>jtds</module>
         <module>dbcp</module>
@@ -97,7 +98,7 @@
         <module>elasticsearch</module>
         <module>reactor</module>
         <module>reactor-netty</module>
-      <module>mssql-jdbc</module>
+
     </modules>
 
     <dependencyManagement>

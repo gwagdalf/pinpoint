@@ -27,8 +27,8 @@ public class MssqlTypeProvider implements TraceMetadataProvider {
 
     @Override
     public void setup(TraceMetadataSetupContext context) {
-        context.addServiceType(MssqlConstants.MSSQL, AnnotationKeyMatchers.exact(AnnotationKey.ARGS0));
-        context.addServiceType(MssqlConstants.MSSQL_EXECUTE_QUERY,
+        context.addServiceType(MssqlConstants.MSSQL_JDBC, AnnotationKeyMatchers.exact(AnnotationKey.ARGS0));
+        context.addServiceType(MssqlConstants.MSSQL_JDBC_QUERY,
                 AnnotationKeyMatchers.exact(AnnotationKey.ARGS0));
     }
 
