@@ -15,7 +15,7 @@ public class MssqlJdbcUrlParserTest {
   private MssqlJdbcUrlParser jdbcUrlParser = new MssqlJdbcUrlParser();
 
   @Test
-  public void mssqlParse1() {
+  public void mssql_jdbc_string_should_be_parsed_1() {
     DatabaseInfo dbInfo = jdbcUrlParser
         .parse("jdbc:sqlserver://ip_address;databaseName=database_name;integratedSecurity=true");
     Assert.assertTrue(dbInfo.isParsingComplete());
@@ -23,11 +23,11 @@ public class MssqlJdbcUrlParserTest {
     Assert.assertEquals(MssqlConstants.MSSQL_JDBC, dbInfo.getType());
     Assert.assertEquals(("ip_address"), dbInfo.getHost().get(0));
     Assert.assertEquals("database_name", dbInfo.getDatabaseId());
-    Assert.assertEquals("jdbc:sqlserver://ip_address:1433;databaseName=database_name", dbInfo.getUrl());
+    Assert.assertEquals("jdbc:sqlserver://ip_address;databaseName=database_name", dbInfo.getUrl());
   }
 
   @Test
-  public void mssqlParse2() {
+  public void mssql_jdbc_string_should_be_parsed_2() {
     DatabaseInfo dbInfo = jdbcUrlParser
         .parse("jdbc:sqlserver://localhost:1433;databaseName=AdventureWorks;integratedSecurity=true;applicationName=MyApp");
     Assert.assertTrue(dbInfo.isParsingComplete());

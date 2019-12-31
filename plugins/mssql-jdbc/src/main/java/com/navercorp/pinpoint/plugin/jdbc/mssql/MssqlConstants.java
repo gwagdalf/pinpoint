@@ -35,5 +35,5 @@ public final class MssqlConstants {
         .of(2250, "MSSQL_JDBC", TERMINAL, INCLUDE_DESTINATION_ID);
     public static final ServiceType MSSQL_JDBC_QUERY = ServiceTypeFactory
         .of(2251, "MSSQL_JDBC_QUERY",
-            "MSSQL_JDBC", TERMINAL, RECORD_STATISTICS, INCLUDE_DESTINATION_ID);
+            "MSSQL_JDBC_QUERY", TERMINAL, RECORD_STATISTICS, INCLUDE_DESTINATION_ID);
 }
